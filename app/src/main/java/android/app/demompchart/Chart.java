@@ -8,11 +8,10 @@ import com.github.mikephil.charting.data.LineDataSet;
 import java.util.ArrayList;
 
 public class Chart {
-    private ArrayList<Entry> dataValues;
-    private LineDataSet lineDataset;
-    private LineData lineData;
-    private LineChart lineChart;
-
+    private final ArrayList<Entry> dataValues;
+    private final LineDataSet lineDataset;
+    private final LineData lineData;
+    private final LineChart lineChart;
     public Chart(LineChart lineChart){
         dataValues = new ArrayList<>();
         lineDataset = new LineDataSet(dataValues, "Line Chart 1");
