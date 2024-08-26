@@ -10,7 +10,7 @@ public class Chart {
     ArrayList<Entry> dataValues;
     LineDataSet lineDataset;
     LineData lineData;
-    LineChart lineChart;
+    public LineChart lineChart;
 
     public Chart(){
         dataValues = new ArrayList<>();
