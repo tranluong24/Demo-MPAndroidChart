@@ -22,8 +22,7 @@ public class Chart {
 
     public void initChart(){
         lineChart.setAutoScaleMinMaxEnabled(true);
-        lineChart.setVisibleXRangeMaximum(500);
-        lineChart.setVisibleXRangeMinimum(500);
+
     }
 
     public void addEntry(float x, float y){
@@ -32,9 +31,15 @@ public class Chart {
 
     public void updateChart(){
         lineDataset.notifyDataSetChanged();
+
         lineData.notifyDataChanged();
+
         lineChart.notifyDataSetChanged();
+
+        lineChart.setVisibleXRangeMaximum(500);
+        lineChart.setVisibleXRangeMinimum(500);
         lineChart.moveViewToX(lineDataset.getEntryCount());
+
         lineChart.invalidate();
     }
 }
