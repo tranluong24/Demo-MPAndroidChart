@@ -24,6 +24,7 @@ public class Chart {
 
     public void initChart(){
         lineDataset.setDrawCircles(true);
+        lineDataset.setCircleColor(Color.RED);
         lineDataset.setColor(Color.TRANSPARENT);
 
         lineChart.setAutoScaleMinMaxEnabled(true);
