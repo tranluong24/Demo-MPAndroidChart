@@ -197,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
                 if (cnt++ == 1001) {
                     timer.cancel();
                 } else {
-                    float yValue = (float) Math.sin(Math.toRadians(xIndex++));
                     runOnUiThread(() -> addEntry(""));
                 }
             }
@@ -205,7 +204,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addEntry(String a){
-        float yValue = (float) Math.sin(Math.toRadians(xIndex++));
+        xIndex+=20;
+        float yValue = (float) Math.sin(Math.toRadians(xIndex));
         chartLine.addEntry(xIndex,yValue);
         chartLine.updateChart();
     }

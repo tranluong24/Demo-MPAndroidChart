@@ -1,5 +1,7 @@
 package android.app.demompchart;
 
+import android.graphics.Color;
+
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -21,6 +23,9 @@ public class Chart {
     }
 
     public void initChart(){
+        lineDataset.setDrawCircles(true);
+        lineDataset.setColor(Color.TRANSPARENT);
+
         lineChart.setAutoScaleMinMaxEnabled(true);
 
     }
