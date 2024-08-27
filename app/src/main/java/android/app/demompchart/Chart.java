@@ -26,7 +26,6 @@ public class Chart {
         lineDataset.setDrawCircles(true);
         lineDataset.setCircleColor(Color.RED);
         lineDataset.setColor(Color.TRANSPARENT);
-
         lineChart.setAutoScaleMinMaxEnabled(true);
 
     }
