@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import android.app.demompchart.Chart;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,11 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView textX;
     private TextView textY;
     Button btn;
-    private int indx = 0;
-    private int dem = 0;
-    ArrayList<Entry> dataValuesTemp;
+    private boolean indx = false;
     ArrayList<Entry> dataValue = new ArrayList<>();
-    Chart chartLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,143 +47,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         lineChart = findViewById(R.id.lineChart);
-        chartLine= new Chart(lineChart);
-        chartLine.initChart();
-        startPlotting();
-
 
         textX = findViewById(R.id.textX);
         textY = findViewById(R.id.textY);
         btn = findViewById(R.id.btnLoad);
 
-//        lineDataSet = new LineDataSet(new ArrayList<>(), "Sine1 Wave");
-//        lineDataSet2 = new LineDataSet(new ArrayList<>(), "Sine2 Wave");
-//        lineDataSet3 = new LineDataSet(new ArrayList<>(), "Sine3 Wave");
-//
-//        lineDataSet2.setDrawCircles(true); // Ẩn các vòng tròn trên điểm
-//        lineDataSet.setDrawCircles(true); // Ẩn các vòng tròn trên điểm
-//        lineDataSet2.setCircleColor(Color.BLUE);
-//        lineDataSet2.setColor(Color.BLUE);
-//        lineDataSet.setColor(Color.RED);
-//        lineDataSet.setCircleColor(Color.RED);
-//
-//        lineDataSet2.setForm(Legend.LegendForm.NONE);
-//        lineDataSet2.setLabel("");
-//        lineDataSet.setForm(Legend.LegendForm.SQUARE);
-//        lineDataSet.setLabel("Sin1");
-//
-//        lineDataSet.setDrawValues(false);
-//        lineDataSet2.setDrawValues(false);
-//
-//        lineData = new LineData(lineDataSet, lineDataSet2);
-//        lineChart.setData(lineData);
-//
-//        lineChart.setTouchEnabled(true);
-//        lineChart.setDragEnabled(true);
-//        lineChart.setScaleEnabled(true);
-//        lineChart.setPinchZoom(true);
-//        lineChart.setDrawGridBackground(false);
-//
-//        Legend legend = lineChart.getLegend();
-//        legend.setTextColor(Color.WHITE);
-//
-//        // Configure X axis to auto-scroll
-//        XAxis xAxis = lineChart.getXAxis();
-//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-//        xAxis.setDrawGridLines(false);
-//        xAxis.setGranularity(1f);
-//        xAxis.setTextColor(Color.WHITE);
-////        xAxis.setLabelCount(100);
-////        xAxis.setDrawLabels(false);
-//
-//        // Configure Y axis to show only on the left
-//        YAxis leftAxis = lineChart.getAxisLeft();
-//        leftAxis.setDrawGridLines(false);
-//        leftAxis.setTextColor(Color.WHITE);
-////        leftAxis.setDrawLabels(false);
-//
-//        YAxis rightAxis = lineChart.getAxisRight();
-//        rightAxis.setEnabled(false); // Disable right y-axis
-//
-//        lineChart.setAutoScaleMinMaxEnabled(true);
-//
-//        lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-//            @Override
-//            public void onValueSelected(Entry e, Highlight h) {
-//                float x = (e.getX() / 1000);
-//                float y = e.getY();
-//
-//                textX.setText("X: " + String.format("%.3f", x));
-//                textY.setText("Y: " + String.format("%.2f", y));
-//            }
-//
-//            @Override
-//            public void onNothingSelected() {
-//                textX.setText("X: ");
-//                textY.setText("Y: ");
-//            }
-//        });
-//
-//        btn.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                timer.cancel();
-//                lineDataSet2.setVisible(false);
-//                lineDataSet.setVisible(false);
-//
-//                lineDataSet.setForm(Legend.LegendForm.NONE);
-//                lineDataSet.setLabel("");
-//                lineDataSet2.setForm(Legend.LegendForm.NONE);
-//                lineDataSet2.setLabel("");
-//
-//                lineDataSet3.clear();
-//
-//                dataValuesTemp = new ArrayList<>(dataValue);
-//
-//                lineDataSet3.setValues(dataValuesTemp);
-//
-//                lineDataSet3.setColor(Color.GREEN);
-//                lineDataSet3.setDrawCircles(true);
-//                lineDataSet3.setCircleColor(Color.GREEN);
-//                lineDataSet3.setCircleRadius(4f); // Điều chỉnh kích thước vòng tròn (mặc định là 4f)
-//                lineDataSet3.setCircleHoleRadius(0f); // Điều chỉnh kích thước của lỗ tròn bên trong (mặc định là 2f)
-//
-//                lineData.addDataSet(lineDataSet3);
-//
-//                lineData.notifyDataChanged();
-//
-//                lineChart.notifyDataSetChanged();
-//
-//                lineChart.setVisibleXRangeMaximum(500);
-//                lineChart.setVisibleXRangeMinimum(500);
-//                lineChart.moveViewToX(xIndex - 1);
-//                lineChart.invalidate();
-//                btn.setText("Resume");
-//                return true;
-//            }
-//        });
-//
-//
-//        btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                btn.setText("Stop");
-//                lineDataSet3.clear();
-//                lineData.removeDataSet(lineDataSet3);
-//
-//                lineData.notifyDataChanged();
-//
-//                lineChart.notifyDataSetChanged();
-//                lineChart.setVisibleXRangeMaximum(500);
-//                lineChart.setVisibleXRangeMinimum(500);
-//                lineChart.moveViewToX(xIndex - 1);
-//                lineChart.invalidate();
-//                startPlotting();
-//            }
-//        });
-//
-//        // Khởi động vẽ liên tục
-//        startPlotting();
+        lineDataSet = new LineDataSet(new ArrayList<>(), "Sine1 Wave");
+        lineDataSet2 = new LineDataSet(new ArrayList<>(), "Sine2 Wave");
+        lineDataSet3 = new LineDataSet(new ArrayList<>(), "Sine3 Wave");
+
+        lineData = new LineData(lineDataSet, lineDataSet2);
+
+        initChart(lineDataSet, lineDataSet2, lineData, lineChart);
+
+        btn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                btn.setText("Resume");
+                Analytic();
+                return true;
+            }
+        });
+
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btn.setText("Stop");
+
+                lineData.removeDataSet(2);
+
+                updateChart();
+                startPlotting();
+            }
+        });
+        startPlotting();
     }
 
     private void startPlotting() {
@@ -194,65 +90,202 @@ public class MainActivity extends AppCompatActivity {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (cnt++ == 1001) {
+                if (cnt == 1234) {
                     timer.cancel();
+                    runOnUiThread(() -> btn.setText("Resume"));
                 } else {
-                    runOnUiThread(() -> addEntry(""));
+                    if(!indx)
+                        runOnUiThread(() -> addEntry(lineDataSet,lineDataSet2));
+                    else runOnUiThread(() -> addEntry(lineDataSet2,lineDataSet));
+                    cnt++;
                 }
             }
-        }, 0, 10); // Vẽ mỗi 100ms
+        }, 0, 10); // Vẽ mỗi 10ms
     }
 
-    private void addEntry(String a){
-        xIndex+=20;
-        float yValue = (float) Math.sin(Math.toRadians(xIndex));
-        chartLine.addEntry(xIndex,yValue);
-        chartLine.updateChart();
+    private void Analytic() {
+        timer.cancel();
+        lineDataSet2.setVisible(false);
+        lineDataSet.setVisible(false);
+
+        lineDataSet.setForm(Legend.LegendForm.NONE);
+        lineDataSet.setLabel("");
+        lineDataSet2.setForm(Legend.LegendForm.NONE);
+        lineDataSet2.setLabel("");
+
+        lineDataSet3.clear();
+
+        ArrayList<Entry> dataEntryTmp = new ArrayList<>(dataValue);
+
+        lineDataSet3.setValues(dataEntryTmp);
+
+        lineDataSet3.setColor(Color.GREEN);
+        lineDataSet3.setDrawCircles(true);
+        lineDataSet3.setCircleColor(Color.GREEN);
+        lineDataSet3.setCircleRadius(4f); // Điều chỉnh kích thước vòng tròn (mặc định là 4f)
+        lineDataSet3.setCircleHoleRadius(0f); // Điều chỉnh kích thước của lỗ tròn bên trong (mặc định là 2f)
+
+        lineData.addDataSet(lineDataSet3);
+
+        updateChart();
     }
 
-    private void addEntry() {
-        float yValue = (float) Math.sin(Math.toRadians(xIndex));
+    private void addEntry(LineDataSet lineSet, LineDataSet lineSetTemp) {
+        float yValue = (float) Math.sin(Math.toRadians(xIndex++));
         dataValue.add(new Entry(xIndex, yValue));
 
-        if (indx == 0) {
-            lineDataSet2.setVisible(false);
-            lineDataSet.setVisible(true);
-            lineDataSet.addEntry(new Entry(xIndex, yValue));
-            if (lineDataSet.getEntryCount() >= 501) {
-                lineDataSet2.addEntry(new Entry(xIndex, yValue));
-            }
-        } else if (indx == 1) {
-            lineDataSet.setVisible(false);
-            lineDataSet2.setVisible(true);
-            lineDataSet2.addEntry(new Entry(xIndex, yValue));
-            if (lineDataSet2.getEntryCount() >= 501) {
-                lineDataSet.addEntry(new Entry(xIndex, yValue));
-            }
+        lineSetTemp.setVisible(false);
+        lineSet.setVisible(true);
+
+        lineSet.addEntry(new Entry(xIndex, yValue));
+
+        if (lineSet.getEntryCount() >= 501) {
+            lineSetTemp.addEntry(new Entry(xIndex, yValue));
         }
-        xIndex += 1;
 
         textX.setText(lineDataSet.getEntryCount() + "");
         textY.setText(lineDataSet2.getEntryCount() + "");
 
-        if (lineDataSet2.getEntryCount() >= 1000 || lineDataSet.getEntryCount() >= 1000) {
-            if (indx == 0) {
-                indx = 1;
-                lineDataSet.clear();
-//                lineDataSet.setForm(Legend.LegendForm.NONE);
-//                lineDataSet.setLabel("");
-//                lineDataSet2.setForm(Legend.LegendForm.SQUARE);
-//                lineDataSet2.setLabel("Sin2");
+        updateChart();
 
-            } else if (indx == 1) {
-                indx = 0;
-                lineDataSet2.clear();
-//                lineDataSet2.setForm(Legend.LegendForm.NONE);
-//                lineDataSet2.setLabel("");
-//                lineDataSet.setForm(Legend.LegendForm.SQUARE);
-//                lineDataSet.setLabel("Sin1");
+        if (lineSet.getEntryCount() == 1000) {
+            indx = !indx;
+            lineSet.clear();
+            textX.setText(lineDataSet.getEntryCount() + "");
+            textY.setText(lineDataSet2.getEntryCount() + "");
+            lineSet.setForm(Legend.LegendForm.NONE);
+            lineSet.setLabel("");
+            lineSetTemp.setForm(Legend.LegendForm.SQUARE);
+            lineSetTemp.setLabel("Sin2");
 
+            lineSetTemp.setVisible(true);
+            lineSet.setVisible(false);
+
+        }
+
+    }
+
+    private void addEntry(LineDataSet lineSet) {
+        float yValue = (float) Math.sin(Math.toRadians(xIndex++));
+        dataValue.add(new Entry(xIndex, yValue));
+
+        if (indx == false) {
+            lineDataSet2.setVisible(false);
+            lineSet.setVisible(true);
+            lineSet.addEntry(new Entry(xIndex, yValue));
+
+            if (lineSet.getEntryCount() >= 501) {
+                lineDataSet2.addEntry(new Entry(xIndex, yValue));
+            }
+        } else if (indx == true) {
+            lineSet.setVisible(false);
+            lineDataSet2.setVisible(true);
+            lineDataSet2.addEntry(new Entry(xIndex, yValue));
+
+            if (lineDataSet2.getEntryCount() >= 501) {
+                lineSet.addEntry(new Entry(xIndex, yValue));
             }
         }
+        textX.setText(lineDataSet.getEntryCount() + "");
+        textY.setText(lineDataSet2.getEntryCount() + "");
+
+        if (lineDataSet2.getEntryCount() >= 1000 || lineSet.getEntryCount() >= 1000) {
+            if (indx == false) {
+                indx = true;
+                lineSet.clear();
+                lineSet.setForm(Legend.LegendForm.NONE);
+                lineSet.setLabel("");
+                lineDataSet2.setForm(Legend.LegendForm.SQUARE);
+                lineDataSet2.setLabel("Sin2");
+
+            } else if (indx == true) {
+                indx = false;
+                lineDataSet2.clear();
+                lineSet.setForm(Legend.LegendForm.SQUARE);
+                lineSet.setLabel("Sin1");
+                lineDataSet2.setForm(Legend.LegendForm.NONE);
+                lineDataSet2.setLabel("");
+            }
+        }
+        updateChart();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timer != null) {
+            timer.cancel();
+        }
+    }
+
+    private void initChart(LineDataSet lineSet1, LineDataSet lineSet2, LineData line, LineChart chart) {
+        lineSet2.setDrawCircles(true); // Ẩn các vòng tròn trên điểm
+        lineSet2.setCircleColor(Color.BLUE);
+        lineSet2.setColor(Color.BLUE);
+
+        lineSet1.setDrawCircles(true); // Ẩn các vòng tròn trên điểm
+        lineSet1.setColor(Color.RED);
+        lineSet1.setCircleColor(Color.RED);
+
+        lineSet2.setForm(Legend.LegendForm.NONE);
+        lineSet2.setLabel("");
+
+        lineSet1.setForm(Legend.LegendForm.SQUARE);
+        lineSet1.setLabel("Sin1");
+
+        lineSet1.setDrawValues(false);
+        lineSet2.setDrawValues(false);
+
+        chart.setData(line);
+
+        chart.setTouchEnabled(true);
+        chart.setDragEnabled(true);
+        chart.setScaleEnabled(true);
+        chart.setPinchZoom(true);
+        chart.setDrawGridBackground(false);
+
+        Legend legend = chart.getLegend();
+        legend.setTextColor(Color.WHITE);
+
+        // Configure X axis to auto-scroll
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setTextColor(Color.WHITE);
+//        xAxis.setLabelCount(100);
+//        xAxis.setDrawLabels(false);
+
+        // Configure Y axis to show only on the left
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setTextColor(Color.WHITE);
+//        leftAxis.setDrawLabels(false);
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setEnabled(false); // Disable right y-axis
+
+        chart.setAutoScaleMinMaxEnabled(true);
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                float x = (e.getX() / 1000);
+                float y = e.getY();
+
+                textX.setText("X: " + String.format("%.3f", x));
+                textY.setText("Y: " + String.format("%.2f", y));
+            }
+
+            @Override
+            public void onNothingSelected() {
+                textX.setText("X: ");
+                textY.setText("Y: ");
+            }
+        });
+    }
+
+    private void updateChart() {
 
         lineDataSet.notifyDataSetChanged();
         lineDataSet2.notifyDataSetChanged();
@@ -267,13 +300,5 @@ public class MainActivity extends AppCompatActivity {
         lineChart.moveViewToX(xIndex - 1);
 
         lineChart.invalidate(); // Cập nhật biểu đồ
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (timer != null) {
-            timer.cancel();
-        }
     }
 }
