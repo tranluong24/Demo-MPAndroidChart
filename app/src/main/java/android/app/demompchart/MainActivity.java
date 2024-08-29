@@ -19,11 +19,8 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.app.demompchart.Chart;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         lineDataSet = new LineDataSet(new ArrayList<>(), "Sine1 Wave");
         lineDataSet2 = new LineDataSet(new ArrayList<>(), "Sine2 Wave");
-        lineDataSet3 = new LineDataSet(new ArrayList<>(), "Sine3 Wave");
 
         lineData = new LineData(lineDataSet, lineDataSet2);
 
@@ -113,11 +109,9 @@ public class MainActivity extends AppCompatActivity {
         lineDataSet2.setForm(Legend.LegendForm.NONE);
         lineDataSet2.setLabel("");
 
-        lineDataSet3.clear();
-
         ArrayList<Entry> dataEntryTmp = new ArrayList<>(dataValue);
 
-        lineDataSet3.setValues(dataEntryTmp);
+        LineDataSet lineDataSet3 = new LineDataSet(dataEntryTmp, "Sine3 Wave");
 
         lineDataSet3.setColor(Color.GREEN);
         lineDataSet3.setDrawCircles(true);
@@ -160,56 +154,9 @@ public class MainActivity extends AppCompatActivity {
 
             lineSetTemp.setVisible(true);
             lineSet.setVisible(false);
-
         }
 
     }
-
-    private void addEntry(LineDataSet lineSet) {
-        float yValue = (float) Math.sin(Math.toRadians(xIndex++));
-        dataValue.add(new Entry(xIndex, yValue));
-
-        if (indx == false) {
-            lineDataSet2.setVisible(false);
-            lineSet.setVisible(true);
-            lineSet.addEntry(new Entry(xIndex, yValue));
-
-            if (lineSet.getEntryCount() >= 501) {
-                lineDataSet2.addEntry(new Entry(xIndex, yValue));
-            }
-        } else if (indx == true) {
-            lineSet.setVisible(false);
-            lineDataSet2.setVisible(true);
-            lineDataSet2.addEntry(new Entry(xIndex, yValue));
-
-            if (lineDataSet2.getEntryCount() >= 501) {
-                lineSet.addEntry(new Entry(xIndex, yValue));
-            }
-        }
-        textX.setText(lineDataSet.getEntryCount() + "");
-        textY.setText(lineDataSet2.getEntryCount() + "");
-
-        if (lineDataSet2.getEntryCount() >= 1000 || lineSet.getEntryCount() >= 1000) {
-            if (indx == false) {
-                indx = true;
-                lineSet.clear();
-                lineSet.setForm(Legend.LegendForm.NONE);
-                lineSet.setLabel("");
-                lineDataSet2.setForm(Legend.LegendForm.SQUARE);
-                lineDataSet2.setLabel("Sin2");
-
-            } else if (indx == true) {
-                indx = false;
-                lineDataSet2.clear();
-                lineSet.setForm(Legend.LegendForm.SQUARE);
-                lineSet.setLabel("Sin1");
-                lineDataSet2.setForm(Legend.LegendForm.NONE);
-                lineDataSet2.setLabel("");
-            }
-        }
-        updateChart();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -260,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setDrawGridLines(false);
         leftAxis.setTextColor(Color.WHITE);
-//        leftAxis.setDrawLabels(false);
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false); // Disable right y-axis
@@ -286,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateChart() {
-
         lineDataSet.notifyDataSetChanged();
         lineDataSet2.notifyDataSetChanged();
 
