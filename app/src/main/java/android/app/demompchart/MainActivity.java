@@ -2,6 +2,7 @@ package android.app.demompchart;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,7 +19,12 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     private LineChart lineChart;
     private LineDataSet lineDataSet;
     private LineDataSet lineDataSet2;
-    private LineDataSet lineDataSet3;
     private LineData lineData;
     private int xIndex = 0;
     private Timer timer;
@@ -36,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView textY;
     Button btn;
     private boolean indx = false;
-    ArrayList<Entry> dataValue = new ArrayList<>();
+    ArrayList<Entry_2> dataValue = new ArrayList<>();
+    Button btnSave, btnNew, btnOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +55,37 @@ public class MainActivity extends AppCompatActivity {
         textY = findViewById(R.id.textY);
         btn = findViewById(R.id.btnLoad);
 
+        btnSave = findViewById(R.id.save);
+        btnNew = findViewById(R.id.newTest);
+        btnOpen = findViewById(R.id.Open);
+
         lineDataSet = new LineDataSet(new ArrayList<>(), "Sine1 Wave");
         lineDataSet2 = new LineDataSet(new ArrayList<>(), "Sine2 Wave");
 
         lineData = new LineData(lineDataSet, lineDataSet2);
 
         initChart(lineDataSet, lineDataSet2, lineData, lineChart);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                writeFile("DataSaved_2.bin");
+            }
+        });
+
+        btnOpen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                readFile("DataSaved_2.bin");
+            }
+        });
+
+        btnNew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         btn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -70,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 btn.setText("Stop");
+                btn.setEnabled(false);
 
                 lineData.removeDataSet(2);
 
@@ -88,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (cnt == 1234) {
                     timer.cancel();
+                    runOnUiThread(() -> btn.setEnabled(true));
                     runOnUiThread(() -> btn.setText("Resume"));
                 } else {
                     if(!indx)
@@ -96,11 +129,10 @@ public class MainActivity extends AppCompatActivity {
                     cnt++;
                 }
             }
-        }, 0, 10); // Vẽ mỗi 10ms
+        }, 0, 1); // Vẽ mỗi 10ms
     }
 
     private void Analytic() {
-        timer.cancel();
         lineDataSet2.setVisible(false);
         lineDataSet.setVisible(false);
 
@@ -126,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addEntry(LineDataSet lineSet, LineDataSet lineSetTemp) {
         float yValue = (float) Math.sin(Math.toRadians(xIndex++));
-        dataValue.add(new Entry(xIndex, yValue));
+        dataValue.add(new Entry_2(xIndex, yValue));
 
         lineSetTemp.setVisible(false);
         lineSet.setVisible(true);
@@ -245,5 +277,61 @@ public class MainActivity extends AppCompatActivity {
         lineChart.moveViewToX(xIndex - 1);
 
         lineChart.invalidate(); // Cập nhật biểu đồ
+    }
+
+    private void writeFile(String file_name){
+        try{
+            FileOutputStream fileOutStream = openFileOutput(file_name, MODE_PRIVATE);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutStream);
+
+            objectOutputStream.writeObject(dataValue);
+
+            textX.setText("OK");
+            objectOutputStream.close();
+            fileOutStream.close();
+
+        }catch(Exception e){
+            Log.e("Error", e.toString());
+            textX.setText("NOT OK");
+        }
+    }
+
+    private void readFile(String file_name){
+        try {
+            FileInputStream fileInputStream = openFileInput(file_name);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
+            ArrayList<Entry_2> dataRead = (ArrayList<Entry_2>) objectInputStream.readObject();
+            Log.d("Thong bao", "Opened succesfull");
+
+
+            objectInputStream.close();
+            fileInputStream.close();
+
+            lineDataSet2.setVisible(false);
+            lineDataSet.setVisible(false);
+
+            lineDataSet.setForm(Legend.LegendForm.NONE);
+            lineDataSet.setLabel("");
+            lineDataSet2.setForm(Legend.LegendForm.NONE);
+            lineDataSet2.setLabel("");
+
+            ArrayList<Entry> dataEntryTmp = new ArrayList<>(dataRead);
+            textX.setText(dataEntryTmp.size()+"");
+
+            LineDataSet lineDataSet3 = new LineDataSet(dataEntryTmp, "Sine3 Wave");
+
+            lineDataSet3.setColor(Color.GREEN);
+            lineDataSet3.setDrawCircles(true);
+            lineDataSet3.setCircleColor(Color.GREEN);
+            lineDataSet3.setCircleRadius(4f); // Điều chỉnh kích thước vòng tròn (mặc định là 4f)
+            lineDataSet3.setCircleHoleRadius(0f); // Điều chỉnh kích thước của lỗ tròn bên trong (mặc định là 2f)
+
+            lineData.addDataSet(lineDataSet3);
+
+            updateChart();
+        }catch(Exception e){
+            Log.e("Error", e.toString());
+        }
     }
 }
