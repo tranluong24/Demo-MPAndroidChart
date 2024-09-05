@@ -1,20 +1,18 @@
 package android.app.demompchart;
 
-import com.github.mikephil.charting.data.Entry;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class Entry_2 extends Entry implements Serializable {
+public class Point extends com.github.mikephil.charting.data.Entry implements Serializable {
 
     private static final long serialVersionUID = 1L; // Thêm serialVersionUID cho an toàn
     private float xValue;
     private float yValue;
 
     // Constructor
-    public Entry_2(float x, float y) {
+    public Point(float x, float y) {
         super(x, y);
         this.xValue = x;
         this.yValue = y;

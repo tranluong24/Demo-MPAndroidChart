@@ -1,11 +1,18 @@
 package android.app.demompchart;
 
+import android.app.Dialog;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +26,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -28,7 +36,7 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements mDialogList.OnItemSelectedListener {
 
     private LineChart lineChart;
     private LineDataSet lineDataSet;
@@ -41,8 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView textY;
     Button btn;
     private boolean indx = false;
-    ArrayList<Entry_2> dataValue = new ArrayList<>();
+    ArrayList<Point> dataValue = new ArrayList<>();
     Button btnSave, btnNew, btnOpen;
+    private ArrayList<String> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         btnNew = findViewById(R.id.newTest);
         btnOpen = findViewById(R.id.Open);
 
+
         lineDataSet = new LineDataSet(new ArrayList<>(), "Sine1 Wave");
         lineDataSet2 = new LineDataSet(new ArrayList<>(), "Sine2 Wave");
 
@@ -66,17 +76,21 @@ public class MainActivity extends AppCompatActivity {
 
         initChart(lineDataSet, lineDataSet2, lineData, lineChart);
 
+        showListFile();
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                writeFile("DataSaved_2.bin");
+                openSetNameDialog();
             }
         });
 
         btnOpen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                readFile("DataSaved_2.bin");
+                btnOpen.setEnabled(false);
+                mDialogList dialogList = new mDialogList(items);
+                dialogList.show(getSupportFragmentManager(), "dialogAlertList");
             }
         });
 
@@ -103,7 +117,9 @@ public class MainActivity extends AppCompatActivity {
                 btn.setText("Stop");
                 btn.setEnabled(false);
 
-                lineData.removeDataSet(2);
+                if (lineData.getDataSetCount() > 1) {
+                    lineData.removeDataSet(2);
+                }
 
                 updateChart();
                 startPlotting();
@@ -123,13 +139,13 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(() -> btn.setEnabled(true));
                     runOnUiThread(() -> btn.setText("Resume"));
                 } else {
-                    if(!indx)
-                        runOnUiThread(() -> addEntry(lineDataSet,lineDataSet2));
-                    else runOnUiThread(() -> addEntry(lineDataSet2,lineDataSet));
-                    cnt++;
+                        if (!indx)
+                            runOnUiThread(() -> addEntry(lineDataSet, lineDataSet2));
+                        else runOnUiThread(() -> addEntry(lineDataSet2, lineDataSet));
+                        cnt++;
                 }
             }
-        }, 0, 1); // Vẽ mỗi 10ms
+        }, 0, 10); // Vẽ mỗi 10ms
     }
 
     private void Analytic() {
@@ -158,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addEntry(LineDataSet lineSet, LineDataSet lineSetTemp) {
         float yValue = (float) Math.sin(Math.toRadians(xIndex++));
-        dataValue.add(new Entry_2(xIndex, yValue));
+        dataValue.add(new Point(xIndex, yValue));
 
         lineSetTemp.setVisible(false);
         lineSet.setVisible(true);
@@ -189,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -279,8 +296,8 @@ public class MainActivity extends AppCompatActivity {
         lineChart.invalidate(); // Cập nhật biểu đồ
     }
 
-    private void writeFile(String file_name){
-        try{
+    private void writeFile(String file_name) {
+        try {
             FileOutputStream fileOutStream = openFileOutput(file_name, MODE_PRIVATE);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutStream);
 
@@ -290,20 +307,19 @@ public class MainActivity extends AppCompatActivity {
             objectOutputStream.close();
             fileOutStream.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("Error", e.toString());
             textX.setText("NOT OK");
         }
     }
 
-    private void readFile(String file_name){
+    private void readFile(String file_name) {
         try {
             FileInputStream fileInputStream = openFileInput(file_name);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
-            ArrayList<Entry_2> dataRead = (ArrayList<Entry_2>) objectInputStream.readObject();
+            ArrayList<Point> dataRead = (ArrayList<Point>) objectInputStream.readObject();
             Log.d("Thong bao", "Opened succesfull");
-
 
             objectInputStream.close();
             fileInputStream.close();
@@ -317,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
             lineDataSet2.setLabel("");
 
             ArrayList<Entry> dataEntryTmp = new ArrayList<>(dataRead);
-            textX.setText(dataEntryTmp.size()+"");
+            textX.setText(dataEntryTmp.size() + "");
 
             LineDataSet lineDataSet3 = new LineDataSet(dataEntryTmp, "Sine3 Wave");
 
@@ -330,8 +346,89 @@ public class MainActivity extends AppCompatActivity {
             lineData.addDataSet(lineDataSet3);
 
             updateChart();
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("Error", e.toString());
         }
+    }
+
+    private void openSetNameDialog() {
+        final Dialog dialogSetName = new Dialog(this);
+        dialogSetName.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogSetName.setContentView(R.layout.layout_dialog_save);
+
+        Window window = dialogSetName.getWindow();
+        if (window == null) {
+            return;
+        }
+
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = Gravity.CENTER;
+        window.setAttributes(windowAttributes);
+
+        Button btnSaveName, btnCancel;
+        EditText nameText;
+
+        btnSaveName = dialogSetName.findViewById(R.id.btnSave);
+        btnCancel = dialogSetName.findViewById(R.id.btnCancel);
+        nameText = dialogSetName.findViewById(R.id.textName);
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogSetName.dismiss();
+            }
+        });
+
+        btnSaveName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = nameText.getText().toString().trim();
+                name += ".bin";
+                if (!items.contains(name)) {
+                    writeFile(name);
+                }else{
+                    Toast.makeText(MainActivity.this, "Name file is exist !",Toast.LENGTH_SHORT).show();
+                }
+
+                items.clear();
+                showListFile();
+
+                dialogSetName.dismiss();
+            }
+        });
+
+        dialogSetName.setCancelable(false);
+        dialogSetName.show();
+    }
+
+    private void showListFile() {
+        File directory = MainActivity.this.getFilesDir();
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                items.add(file.getName().trim());
+                Log.d("FileHelper", "File: " + file.getName().substring(0, file.getName().length() - 4));
+            }
+        } else {
+            Log.d("FileHelper", "No files found");
+        }
+    }
+
+    @Override
+    public void onItemSelected(String item) {
+        if (lineData.getDataSetCount() > 1) {
+            lineData.removeDataSet(2);
+        }
+        readFile(item);
+        btnOpen.setEnabled(true);
+    }
+
+    @Override
+    public void onCancel() {
+        btnOpen.setEnabled(true);
     }
 }
