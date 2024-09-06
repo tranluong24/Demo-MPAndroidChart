@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements mDialogList.OnIte
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                btnSave.setEnabled(false);
                 openSetNameDialog();
             }
         });
@@ -378,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements mDialogList.OnIte
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnSave.setEnabled(true);
                 dialogSetName.dismiss();
             }
         });
@@ -385,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements mDialogList.OnIte
         btnSaveName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnSave.setEnabled(true);
                 String name = nameText.getText().toString().trim();
                 name += ".bin";
                 if (!items.contains(name)) {
@@ -414,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements mDialogList.OnIte
                 Log.d("FileHelper", "File: " + file.getName().substring(0, file.getName().length() - 4));
             }
         } else {
-            Log.d("FileHelper", "No files found");
+
         }
     }
 
